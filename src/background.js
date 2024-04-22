@@ -389,14 +389,22 @@ function importTabsFromFile(info, currentTab) {
         document.body.appendChild(fileInput);
 
         let processButton = document.createElement("button");
-        processButton.textContent = "Import Tabs";
+        processButton.textContent = "Process List";
+        processButton.title = "View processed contents of selected file";
         processButton.style.marginLeft = "10px";
         document.body.appendChild(processButton);
 
         let submitButton = document.createElement("button");
-        submitButton.textContent = "Submit";
+        submitButton.textContent = "Export Changes";
+        submitButton.title = "Save selected links to a file";
         submitButton.style.marginLeft = "10px";
         document.body.appendChild(submitButton);
+        
+        let importButton = document.createElement("button");
+        importButton.textContent = "Import List";
+        importButton.title = "Import selected links as tabs to the browser";
+        importButton.style.marginLeft = "10px";
+        document.body.appendChild(importButton);
 
         let messageContainer = document.createElement("div");
         messageContainer.style.marginTop = "20px";
@@ -406,6 +414,16 @@ function importTabsFromFile(info, currentTab) {
         listContainer.style.margin = "10px 0";
         listContainer.style.marginTop = "20px";
         document.body.appendChild(listContainer);
+
+        function purify(line) {
+            console.log("input: " + line);
+              // if the line doesn't start with a number, omit it
+              // remove everything up to ":", then trim
+              if (!/^\\d/.test(line)) return '';
+              line = line.replace(/^[^:]*:/, '').trim();
+              console.log("output: " + line);
+              return line;
+       }
 
         processButton.addEventListener("click", () => {
           if (fileInput.files.length === 0) {
@@ -417,16 +435,24 @@ function importTabsFromFile(info, currentTab) {
           let file = fileInput.files[0];
           let reader = new FileReader();
           
-            function purify(line) {
-            console.log("input: " + line);
-              // if the line doesn't start with a number, omit it
-              // remove everything up to ":", then trim
-              if (!/^\\d/.test(line)) return '';
-              line = line.replace(/^[^:]*:/, '').trim();
-              console.log("output: " + line);
-              return line;
+
+            function getFavicon(url) {
+              try {
+                const domain = new URL(url).origin;
+                //return \`\${domain}/favicon.ico\`;
+                      // https://www.google.com/s2/favicons?domain=
+                      // https://s2.googleusercontent.com/s2/favicons?domain_url=;
+                return \`https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=\${domain}&size=16\`; // lets see how long this technique endures
+                //TODO: use url and not domain, find way to reliably escape the urls parameters, so that the url itself can be safely passed as a parameter
+               } catch (e) {
+                console.error("Invalid URL:", url);
+                return "";
+              }
             }
-            
+           
+          
+           
+           
           reader.onload = function(event) {
             let content = event.target.result;
             let urls = content.split("\\n").map(purify).filter(url => url.trim() !== "");
@@ -448,13 +474,25 @@ function importTabsFromFile(info, currentTab) {
               checkbox.checked = true;
               checkbox.id = "url_" + index;
 
+              let favicon = document.createElement("img");
+              let faviconUrl = getFavicon(url);
+              if (faviconUrl) {
+                favicon.src = faviconUrl;
+                favicon.alt = "Favicon";
+                favicon.style.width = "16px";
+                favicon.style.height = "16px";
+                favicon.style.marginLeft = "7px";
+                favicon.style.marginRight = "7px";
+                listItem.appendChild(favicon);
+              }
+
               let label = document.createElement("label");
               label.style.marginLeft = "7px";
               label.htmlFor = "url_" + index;
               label.textContent = url;
 
                 
-              // align item to the left; reduce padding and margin; seperate checkbox and label 
+              // align item to the left; reduce padding and margin; separate checkbox and label 
                 listItem.style.display = "flex";
                 listItem.style.alignItems = "center";
                 listItem.style.margin = "5px";
@@ -497,10 +535,48 @@ function importTabsFromFile(info, currentTab) {
               uncheckedLinks.push(label.textContent);
             }
           });
+          
+          function download(filename, text) {
+              var element = document.createElement("a");
+              element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
+              element.setAttribute("download", filename);
+
+              element.style.display = "none";
+              document.body.appendChild(element);
+
+              element.click();
+
+              document.body.removeChild(element);
+          }
 
           console.log("Checked Links (" + checkedLinks.length + "):", checkedLinks);
           console.log("Unchecked Links (" + uncheckedLinks.length + "):", uncheckedLinks);
+          download("checked_links.txt", checkedLinks.join("\\n")); //TODO prepend Number + ":" 
         });
+        
+        importButton.addEventListener("click", () => {
+            let checkedLinks = [];
+            listContainer.querySelectorAll("div").forEach(item => {
+                let checkbox = item.querySelector("input[type='checkbox']");
+                let label = item.querySelector("label");
+                if (checkbox.checked) {
+                checkedLinks.push(label.textContent);
+                }
+            });
+    
+            console.log("Checked Links (" + checkedLinks.length + "):", checkedLinks);
+    
+            // Open each URL in a new tab
+            checkedLinks.forEach(url => {
+              //browser.tabs.create({ url: url.trim() });
+              //window.open(purify(url), "_blank").focus(); //purification not necessary, we deal with already filtered list
+              window.open(url.trim(), "_blank").focus();
+              console.log("Opening URL: " + purify(url));
+              
+              //TODO crashes on encounter with system relative urls 
+              
+            });
+            });
       `,
     });
   });
