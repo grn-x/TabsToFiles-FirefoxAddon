@@ -6,4 +6,4 @@ The extension needs HTML modification permissions since it is opening a webpage 
 
 if I find a more elegant way to open and load custom HTML pages from my addon I will happily replace this sketchy looking permission.
 
-Latest build is in ... [build(https://github.com/grn-x/TabsToFiles-FirefoxAddon/build/web-ext-artifacts)] :D 
+Latest build is in ... [build](https://github.com/grn-x/TabsToFiles-FirefoxAddon/build/web-ext-artifacts) :D 
