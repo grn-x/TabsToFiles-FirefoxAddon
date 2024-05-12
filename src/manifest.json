@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "TabsToFile",
+  "version": "1.0",
+
+  "description": "Allows viewing and exporting selected Tabs' URLs as html or txt document",
+  "homepage_url": "https://github.com/grn-x/TabsToFiles-FirefoxAddon",
+  
+  "permissions": [
+      "tabs",
+	  "menus",
+	  "storage",
+	  "contextMenus",
+	  "activeTab",
+	  "<all_urls>"
+    ],
+  
+  
+  "icons": {
+    "48": "border-48.png"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  }
+}

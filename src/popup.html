@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Popup with Text Area</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="myTextArea" rows="4" cols="50" placeholder="Enter search term to export all the tabs whose URL or title contain this string.&#10;&#10;For use cases like this one, the Firefox window prompt method would be the perfect choice and also much better-looking. Unfortunately, after hours of trying to figure out the problem, I still wasnt able to get it to work, so I'll have to use this ugly popup. Sorry."></textarea>
+    <script src="popup.js"></script>
+</body>
+</html>
