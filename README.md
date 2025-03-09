@@ -115,3 +115,6 @@ Refer to the [official documentation](https://extensionworkshop.com/documentatio
 Everything from bug reports to feature requests or even direct code contributions are welcome.
 Please open an issue or submit a pull request.
 
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
