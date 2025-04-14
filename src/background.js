@@ -369,6 +369,11 @@ function exportAllTabsSearchterm_depr(info, currentTab) {
 
 
 
+function importTabsFromFile(info, currentTab) {
+  //TODO!
+}
+
+
 const MENU_ID = 'exportSelectedTabURLs';
 browser.menus.create({
   id: MENU_ID,
@@ -411,6 +416,19 @@ browser.menus.create({
   }
 });
 
+const MENU_ID_IMPORT = 'importTabsFromFile';
+browser.menus.create({
+  id: MENU_ID_IMPORT,
+  type: 'normal',
+  title: 'Import tabs from file',
+  enabled: true,
+  contexts: ['tab'],
+}, () => {
+  if (browser.runtime.lastError) {
+    console.error('Error creating menu item: ' + browser.runtime.lastError);
+  }
+});
+
 browser.menus.onClicked.addListener((info, tab) => {
   switch (info.menuItemId) {
     case MENU_ID_CURRENT_WINDOW:
@@ -419,6 +437,9 @@ browser.menus.onClicked.addListener((info, tab) => {
     case MENU_ID_SEARCHTERM:
       exportAllTabsSearchterm(info, tab);
       break;
+      case MENU_ID_IMPORT:
+        importTabsFromFile(info, tab);
+        break;
     default:
       exportTabs(info, tab);
   }
