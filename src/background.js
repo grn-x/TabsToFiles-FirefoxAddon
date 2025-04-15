@@ -370,9 +370,69 @@ function exportAllTabsSearchterm_depr(info, currentTab) {
 
 
 function importTabsFromFile(info, currentTab) {
-  //TODO!
-}
+  browser.tabs.create({ url: 'https://www.example.com' }).then((newTab) => {
+    browser.tabs.executeScript(newTab.id, {
+      code: `
+        document.body.textContent = "";
+        document.body.style.backgroundColor = "white";
+        document.body.style.color = "black";
+        document.body.style.fontFamily = "Arial, sans-serif";
+        document.body.style.padding = "20px";
 
+        let header = document.createElement("h1");
+        header.textContent = "Import Tabs from File";
+        document.body.appendChild(header);
+
+        let fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = ".txt";
+        document.body.appendChild(fileInput);
+
+        let processButton = document.createElement("button");
+        processButton.textContent = "Import Tabs";
+        processButton.style.marginLeft = "10px";
+        document.body.appendChild(processButton);
+
+        let messageContainer = document.createElement("div");
+        messageContainer.style.marginTop = "20px";
+        document.body.appendChild(messageContainer);
+
+        
+        processButton.addEventListener("click", () => {
+          if (fileInput.files.length === 0) {
+            messageContainer.textContent = "Please select a file.";
+            messageContainer.style.color = "red";
+            return;
+          }
+
+          let file = fileInput.files[0];
+          let reader = new FileReader();
+
+          reader.onload = function(event) {
+            let content = event.target.result;
+            let urls = content.split("\\n").filter(url => url.trim() !== "");
+
+            if (urls.length === 0) {
+              messageContainer.textContent = "The file is empty or contains no valid URLs.";
+              messageContainer.style.color = "red";
+              return;
+            }
+
+            messageContainer.textContent = "Importing " + urls.length + " tabs...";
+            messageContainer.style.color = "green";
+
+            //execute
+            urls.forEach(url => {
+              browser.tabs.create({ url: url.trim() });
+            });
+          };
+
+          reader.readAsText(file);
+        });
+      `,
+    });
+  });
+}
 
 const MENU_ID = 'exportSelectedTabURLs';
 browser.menus.create({
