@@ -421,9 +421,17 @@ function importTabsFromFile(info, currentTab) {
             messageContainer.textContent = "Importing " + urls.length + " tabs...";
             messageContainer.style.color = "green";
 
-            //execute
+            function purify(line) {
+              // if the line doesn't start with a number, omit it
+              // remove everything up to ":", then trim
+              if (!/^\\d/.test(line)) return '';
+              return line.replace(/^[^:]*:/, '').trim();
+            }
+
             urls.forEach(url => {
-              browser.tabs.create({ url: url.trim() });
+              //browser.tabs.create({ url: url.trim() });
+              window.open(purify(url), "_blank").focus();
+              console.log("Opening URL: " + purify(url));
             });
           };
 
