@@ -393,11 +393,19 @@ function importTabsFromFile(info, currentTab) {
         processButton.style.marginLeft = "10px";
         document.body.appendChild(processButton);
 
+        let submitButton = document.createElement("button");
+        submitButton.textContent = "Submit";
+        submitButton.style.marginLeft = "10px";
+        document.body.appendChild(submitButton);
+
         let messageContainer = document.createElement("div");
         messageContainer.style.marginTop = "20px";
         document.body.appendChild(messageContainer);
 
-        
+        let listContainer = document.createElement("div");
+        listContainer.style.marginTop = "20px";
+        document.body.appendChild(listContainer);
+
         processButton.addEventListener("click", () => {
           if (fileInput.files.length === 0) {
             messageContainer.textContent = "Please select a file.";
@@ -407,35 +415,67 @@ function importTabsFromFile(info, currentTab) {
 
           let file = fileInput.files[0];
           let reader = new FileReader();
-
+          
+            function purify(line) {
+            console.log("input: " + line);
+              // if the line doesn't start with a number, omit it
+              // remove everything up to ":", then trim
+              if (!/^\\d/.test(line)) return '';
+              line = line.replace(/^[^:]*:/, '').trim();
+              console.log("output: " + line);
+              return line;
+            }
+            
           reader.onload = function(event) {
             let content = event.target.result;
-            let urls = content.split("\\n").filter(url => url.trim() !== "");
-
+            let urls = content.split("\\n").map(purify).filter(url => url.trim() !== "");
+            console.log(urls);
             if (urls.length === 0) {
               messageContainer.textContent = "The file is empty or contains no valid URLs.";
               messageContainer.style.color = "red";
               return;
             }
 
-            messageContainer.textContent = "Importing " + urls.length + " tabs...";
+            messageContainer.textContent = "Displaying " + urls.length + " links...";
             messageContainer.style.color = "green";
 
-            function purify(line) {
-              // if the line doesn't start with a number, omit it
-              // remove everything up to ":", then trim
-              if (!/^\\d/.test(line)) return '';
-              return line.replace(/^[^:]*:/, '').trim();
-            }
+            listContainer.innerHTML = ""; // clear previous
+            urls.forEach((url, index) => {
+              let listItem = document.createElement("div");
+              let checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.checked = true;
+              checkbox.id = "url_" + index;
 
-            urls.forEach(url => {
-              //browser.tabs.create({ url: url.trim() });
-              window.open(purify(url), "_blank").focus();
-              console.log("Opening URL: " + purify(url));
+              let label = document.createElement("label");
+              label.htmlFor = "url_" + index;
+              label.textContent = url;
+
+              listItem.appendChild(checkbox);
+              listItem.appendChild(label);
+              listContainer.appendChild(listItem);
             });
           };
 
           reader.readAsText(file);
+        });
+
+        submitButton.addEventListener("click", () => {
+          let checkedLinks = [];
+          let uncheckedLinks = [];
+
+          listContainer.querySelectorAll("div").forEach(item => {
+            let checkbox = item.querySelector("input[type='checkbox']");
+            let label = item.querySelector("label");
+            if (checkbox.checked) {
+              checkedLinks.push(label.textContent);
+            } else {
+              uncheckedLinks.push(label.textContent);
+            }
+          });
+
+          console.log("Checked Links (" + checkedLinks.length + "):", checkedLinks);
+          console.log("Unchecked Links (" + uncheckedLinks.length + "):", uncheckedLinks);
         });
       `,
     });
