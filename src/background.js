@@ -403,6 +403,7 @@ function importTabsFromFile(info, currentTab) {
         document.body.appendChild(messageContainer);
 
         let listContainer = document.createElement("div");
+        listContainer.style.margin = "10px 0";
         listContainer.style.marginTop = "20px";
         document.body.appendChild(listContainer);
 
@@ -448,9 +449,32 @@ function importTabsFromFile(info, currentTab) {
               checkbox.id = "url_" + index;
 
               let label = document.createElement("label");
+              label.style.marginLeft = "7px";
               label.htmlFor = "url_" + index;
               label.textContent = url;
 
+                
+              // align item to the left; reduce padding and margin; seperate checkbox and label 
+                listItem.style.display = "flex";
+                listItem.style.alignItems = "center";
+                listItem.style.margin = "5px";
+                listItem.style.padding = "5px";
+                listItem.style.border = "1px solid #ccc";
+                listItem.style.borderRadius = "4px";
+                listItem.style.backgroundColor = "#f9f9f9";
+                
+                
+                listItem.style.width = "66.66vw"; 
+                listItem.style.whiteSpace = "normal"; // text wrap
+                listItem.style.wordBreak = "break-word"; // line break
+                listItem.style.overflow = "hidden"; 
+                
+                
+                //listItem.style.cursor = "pointer"; //uncomment when whole item box is clickable
+                
+
+               
+                
               listItem.appendChild(checkbox);
               listItem.appendChild(label);
               listContainer.appendChild(listItem);
