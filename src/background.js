@@ -426,7 +426,21 @@ function importTabsFromFile(info, currentTab) {
               console.log("output: " + line);
               return line;
             }
-            
+
+            function getFavicon(url) {
+              try {
+                const domain = new URL(url).origin;
+                //return \`\${domain}/favicon.ico\`;
+                      // https://www.google.com/s2/favicons?domain=
+                      // https://s2.googleusercontent.com/s2/favicons?domain_url=;
+                return \`https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=\${domain}&size=16\`; // lets see how long this technique endures
+                //TODO: use url and not domain, find way to reliably escape the urls parameters, so that the url itself can be safely passed as a parameter
+               } catch (e) {
+                console.error("Invalid URL:", url);
+                return "";
+              }
+            }
+           
           reader.onload = function(event) {
             let content = event.target.result;
             let urls = content.split("\\n").map(purify).filter(url => url.trim() !== "");
@@ -447,6 +461,18 @@ function importTabsFromFile(info, currentTab) {
               checkbox.type = "checkbox";
               checkbox.checked = true;
               checkbox.id = "url_" + index;
+
+              let favicon = document.createElement("img");
+              let faviconUrl = getFavicon(url);
+              if (faviconUrl) {
+                favicon.src = faviconUrl;
+                favicon.alt = "Favicon";
+                favicon.style.width = "16px";
+                favicon.style.height = "16px";
+                favicon.style.marginLeft = "7px";
+                favicon.style.marginRight = "7px";
+                listItem.appendChild(favicon);
+              }
 
               let label = document.createElement("label");
               label.style.marginLeft = "7px";
